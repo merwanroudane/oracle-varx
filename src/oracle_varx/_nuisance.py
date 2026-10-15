@@ -18,8 +18,9 @@ GitHub: https://github.com/merwanroudane
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Any, Sequence
+from typing import Any
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -314,7 +315,7 @@ def cross_fit(
         delayed(_fit_one_fold)(
             fold, Y, W, p, base, int(child) % (2**31 - 1) if child is not None else None
         )
-        for fold, child in zip(folds, child_seeds)
+        for fold, child in zip(folds, child_seeds, strict=True)
     )
 
     first_row = min(f.test_start for f in folds)

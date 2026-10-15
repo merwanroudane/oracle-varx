@@ -230,7 +230,7 @@ def make_oracle_dgp(
     # regimes may not be reached at all, and an empty regime is not a regime.
     bounds = [0, min(decay_lag3, n_obs), min(decay_lag2, n_obs), n_obs]
     regimes = tuple(
-        (lo, hi) for lo, hi in zip(bounds, bounds[1:]) if hi > lo
+        (lo, hi) for lo, hi in zip(bounds, bounds[1:], strict=False) if hi > lo
     )
     truth = ToyGroundTruth(
         A=A,

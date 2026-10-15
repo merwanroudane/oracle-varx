@@ -101,7 +101,7 @@ def test_blocked_folds_tile_without_overlapping_test_ranges():
     folds = blocked_folds(n_obs=1000, n_train=200, block=20, p_max=5)
     assert all(
         later.test_start >= earlier.test_end
-        for earlier, later in zip(folds, folds[1:])
+        for earlier, later in zip(folds, folds[1:], strict=False)
     )
     assert all(fold.n_train == 200 for fold in folds)
     assert folds[1].train_start - folds[0].train_start == 20

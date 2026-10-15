@@ -9,8 +9,8 @@ GitHub: https://github.com/merwanroudane
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Any, Sequence
 
 import numpy as np
 from scipy.stats import norm
@@ -18,7 +18,7 @@ from statsmodels.stats.multitest import multipletests
 
 from ._config import OracleVARXConfig
 from ._nuisance import cross_fit
-from ._utils import blocked_folds, build_stacks, rolling_windows
+from ._utils import blocked_folds, rolling_windows
 
 __all__ = [
     "second_stage",

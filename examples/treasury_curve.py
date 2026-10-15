@@ -7,11 +7,21 @@ question is the paper's own, asked of a public-domain dataset.
 
 Run it:
 
-    python examples/treasury_curve.py
+    python examples/treasury_curve.py                 # about 5 minutes
+    python examples/treasury_curve.py --quick         # seconds, linear first stage
+    python examples/treasury_curve.py --block 21      # the paper's monthly refit
 
 It prints every table and writes the figures to ``docs/assets/``. This script is
 the single source of the README walkthrough and the documentation site, so the
 three can never drift.
+
+**On runtime.** The first stage dominates, at ``F * S`` fits with
+``S = n p_max (p_max + 3) / 2`` per block and ``F`` blocks. With nine series,
+``p_max = 5`` and the paper's monthly refit (``block=21``) that is 29,700 Extra
+Trees fits — around half an hour on a laptop. The default here refits quarterly
+(``block=63``), which is 9,900 fits and the same estimator on a coarser grid of
+blocks; ``--block 21`` restores the paper's setting. ``cost_report`` prints the
+count for any configuration before you commit to it.
 
 Author: Dr Merwan Roudane <merwanroudane920@gmail.com>
 GitHub: https://github.com/merwanroudane
@@ -19,13 +29,14 @@ GitHub: https://github.com/merwanroudane
 
 from __future__ import annotations
 
+import argparse
+import time
 from pathlib import Path
 
 import matplotlib
 
 matplotlib.use("Agg")  # write files, open no windows
 
-import numpy as np
 import pandas as pd
 
 from oracle_varx import OracleVARX, OracleVARXConfig, admissible_window, cost_report
@@ -44,7 +55,32 @@ def rule(title: str) -> None:
     print("=" * 78)
 
 
-def main() -> None:
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument(
+        "--learner", default="extra_trees",
+        help="first-stage learner (default: extra_trees)",
+    )
+    parser.add_argument(
+        "--block", type=int, default=63,
+        help="cross-fitting block length and refit interval; the paper uses 21",
+    )
+    parser.add_argument(
+        "--p-max", type=int, default=5, help="maximum lag order (default: 5)"
+    )
+    parser.add_argument(
+        "--n-jobs", type=int, default=4, help="blocks fitted in parallel"
+    )
+    parser.add_argument(
+        "--quick", action="store_true",
+        help="use the linear first stage: seconds instead of minutes",
+    )
+    return parser.parse_args()
+
+
+def main(args: argparse.Namespace | None = None) -> None:
+    args = args or parse_args()
+    learner = "linear" if args.quick else args.learner
     # ---------------------------------------------------------------- Step 1
     rule("Step 1 — load the shipped data")
     Y, W = load_treasury()
@@ -61,11 +97,11 @@ def main() -> None:
     # ---------------------------------------------------------------- Step 2
     rule("Step 2 — choose the configuration, and check assumption (W)")
     config = OracleVARXConfig(
-        p_max=5,
+        p_max=args.p_max,
         ols_window=252,
-        block=21,
+        block=args.block,
         validation_days=21,
-        lag_offset=5,
+        lag_offset=args.p_max,
         q=0.05,
     )
     print(config.summary())
@@ -82,11 +118,14 @@ def main() -> None:
 
     # ---------------------------------------------------------------- Step 3
     rule("Step 3 — estimate")
+    print(f"first-stage learner: {learner}")
+    started = time.time()
     model = OracleVARX(
-        config, method="oracle-varx", learner="extra_trees", seed=42, n_jobs=4
+        config, method="oracle-varx", learner=learner, seed=42, n_jobs=args.n_jobs
     )
     results = model.fit(Y, W)
     print(results)
+    print(f"  fitted in           : {time.time() - started:.1f} s")
 
     # ---------------------------------------------------------------- Step 4
     rule("Step 4 — the journal table for the last trading day")

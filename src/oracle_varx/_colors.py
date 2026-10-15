@@ -14,7 +14,7 @@ GitHub: https://github.com/merwanroudane
 
 from __future__ import annotations
 
-from typing import Sequence
+from collections.abc import Sequence
 
 import numpy as np
 
@@ -247,7 +247,7 @@ def resolve_colorscale(name: str = "Parula", n_breaks: int = 32):
     if key in builders:
         cols = builders[key](n_breaks)
         vals = np.linspace(0.0, 1.0, n_breaks)
-        return [[float(v), c] for v, c in zip(vals, cols)]
+        return [[float(v), c] for v, c in zip(vals, cols, strict=True)]
     if key in _NATIVE_PLOTLY:
         return key.capitalize() if key != "rdbu" else "RdBu"
     return name

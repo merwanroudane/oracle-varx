@@ -7,7 +7,6 @@ GitHub: https://github.com/merwanroudane
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Sequence
 
 import numpy as np
 import pandas as pd
@@ -336,7 +335,13 @@ class OracleVARXResults:
         CausalLagGraph
         """
         w = range(self.n_windows)[window]
-        label = str(self._labels()[w])
+        stamp = self._labels()[w]
+        # A full timestamp repr overruns every title it appears in.
+        label = (
+            pd.Timestamp(stamp).date().isoformat()
+            if isinstance(stamp, (pd.Timestamp, np.datetime64))
+            else str(stamp)
+        )
         return CausalLagGraph(
             adjacency=self.edges[w],
             coef=self.coef[w],
@@ -441,6 +446,24 @@ class OracleVARXResults:
         from ._plots import plot_coefficient_paths
 
         return plot_coefficient_paths(self, **kwargs)
+
+    def plot_lag_vs_volatility(self, reference, **kwargs):
+        """Selected lag order against a volatility series; the paper's Figure 5."""
+        from ._plots import plot_lag_vs_volatility
+
+        return plot_lag_vs_volatility(self, reference, **kwargs)
+
+    def plot_residual_diagnostics(self, **kwargs):
+        """Autocorrelation and a QQ plot of the forecast errors; an addition."""
+        from ._plots import plot_residual_diagnostics
+
+        return plot_residual_diagnostics(self, **kwargs)
+
+    def plot_fdr_power_curve(self, A_true, **kwargs):
+        """Realised FDR and power against the nominal BH level; an addition."""
+        from ._plots import plot_fdr_power_curve
+
+        return plot_fdr_power_curve(self, A_true, **kwargs)
 
     def plot_edge_heatmap(self, **kwargs):
         """Parula heatmap of the z-statistics through time; an addition."""

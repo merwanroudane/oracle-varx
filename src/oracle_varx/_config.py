@@ -9,7 +9,7 @@ GitHub: https://github.com/merwanroudane
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, replace
 
 __all__ = ["OracleVARXConfig", "ALPHA_GRID"]
 
@@ -97,7 +97,7 @@ class OracleVARXConfig:
 
     # ------------------------------------------------------------------ presets
     @classmethod
-    def synthetic(cls) -> "OracleVARXConfig":
+    def synthetic(cls) -> OracleVARXConfig:
         """The paper's synthetic-benchmark column of Table 10.
 
         Examples
@@ -114,7 +114,7 @@ class OracleVARXConfig:
         )
 
     @classmethod
-    def financial(cls) -> "OracleVARXConfig":
+    def financial(cls) -> OracleVARXConfig:
         """The paper's ETF-application column of Table 10.
 
         Examples
@@ -130,7 +130,7 @@ class OracleVARXConfig:
             lag_offset=10,
         )
 
-    def replace(self, **changes) -> "OracleVARXConfig":
+    def replace(self, **changes) -> OracleVARXConfig:
         """Return a copy with some fields changed.
 
         Examples

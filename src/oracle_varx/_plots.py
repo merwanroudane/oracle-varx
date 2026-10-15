@@ -11,7 +11,7 @@ GitHub: https://github.com/merwanroudane
 
 from __future__ import annotations
 
-from typing import Sequence
+from collections.abc import Sequence
 
 import numpy as np
 import pandas as pd
@@ -358,7 +358,7 @@ def plot_graph(results, window: int = -1, ax=None, layout: str = "circular"):
             )
         ax.scatter(positions[:, 0], positions[:, 1], s=620, color="white",
                    edgecolor=_INK, zorder=3, linewidth=1.0)
-        for name, (x, y) in zip(graph.names, positions):
+        for name, (x, y) in zip(graph.names, positions, strict=True):
             ax.text(x, y, name, ha="center", va="center", zorder=4, fontsize=9)
         handles = [
             plt.Line2D([], [], color=palette[k], label=f"lag {k + 1}")
@@ -369,9 +369,10 @@ def plot_graph(results, window: int = -1, ax=None, layout: str = "circular"):
             ax.legend(handles=handles, loc="lower center", ncols=min(len(handles), 4),
                       bbox_to_anchor=(0.5, -0.08))
         ax.set_title(
-            f"Causal lag graph{f' — {graph.label}' if graph.label else ''}"
-            f"  ($\\hat{{p}}$ = {graph.lag}, {graph.n_edges} edges)",
+            f"Causal lag graph{f' — {graph.label}' if graph.label else ''}\n"
+            f"$\\hat{{p}}$ = {graph.lag}, {graph.n_edges} edges",
             loc="left",
+            fontsize=10,
         )
         ax.set_xlim(-1.45, 1.45)
         ax.set_ylim(-1.45, 1.45)

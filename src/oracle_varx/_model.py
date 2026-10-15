@@ -6,13 +6,20 @@ GitHub: https://github.com/merwanroudane
 
 from __future__ import annotations
 
-from typing import Any, Sequence
+from typing import Any
 
 import numpy as np
 import pandas as pd
 
 from ._config import OracleVARXConfig
-from ._core import METHODS, acle_stage1, bh_edges, fit_windows, rmse_lag_selection, rolling_validation
+from ._core import (
+    METHODS,
+    acle_stage1,
+    bh_edges,
+    fit_windows,
+    rmse_lag_selection,
+    rolling_validation,
+)
 from ._results import OracleVARXResults
 from ._utils import admissible_window, as_matrix
 
