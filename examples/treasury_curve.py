@@ -75,6 +75,11 @@ def parse_args() -> argparse.Namespace:
         "--quick", action="store_true",
         help="use the linear first stage: seconds instead of minutes",
     )
+    parser.add_argument(
+        "--cache", type=Path, default=None,
+        help="reuse a saved fit if the file exists, and write it if it does not; "
+             "figure work then needs no refit",
+    )
     return parser.parse_args()
 
 
@@ -120,12 +125,24 @@ def main(args: argparse.Namespace | None = None) -> None:
     rule("Step 3 — estimate")
     print(f"first-stage learner: {learner}")
     started = time.time()
-    model = OracleVARX(
-        config, method="oracle-varx", learner=learner, seed=42, n_jobs=args.n_jobs
-    )
-    results = model.fit(Y, W)
+    if args.cache is not None and args.cache.exists():
+        import joblib
+
+        results = joblib.load(args.cache)
+        print(f"  loaded a saved fit from {args.cache}")
+    else:
+        model = OracleVARX(
+            config, method="oracle-varx", learner=learner, seed=42, n_jobs=args.n_jobs
+        )
+        results = model.fit(Y, W)
+        if args.cache is not None:
+            import joblib
+
+            args.cache.parent.mkdir(parents=True, exist_ok=True)
+            joblib.dump(results, args.cache)
+            print(f"  saved the fit to {args.cache}")
     print(results)
-    print(f"  fitted in           : {time.time() - started:.1f} s")
+    print(f"  ready in            : {time.time() - started:.1f} s")
 
     # ---------------------------------------------------------------- Step 4
     rule("Step 4 — the journal table for the last trading day")
@@ -185,10 +202,15 @@ def main(args: argparse.Namespace | None = None) -> None:
     fig, _ = results.plot_residual_diagnostics()
     figures["residual_diagnostics"] = fig
 
+    # The heatmap is one pixel column per output day, so it rasterises large;
+    # the documentation site has to stay quick to load.
+    raster_dpi = {"edge_heatmap": 90}
+
     for name, figure in figures.items():
-        figure.savefig(ASSETS / f"{name}.png", dpi=150)
+        figure.savefig(ASSETS / f"{name}.png", dpi=raster_dpi.get(name, 150))
         figure.savefig(ASSETS / f"{name}.pdf")
-        print(f"  wrote docs/assets/{name}.png and .pdf")
+        size_kb = (ASSETS / f"{name}.png").stat().st_size / 1024
+        print(f"  wrote docs/assets/{name}.png ({size_kb:.0f} KB) and .pdf")
 
     # ---------------------------------------------------------------- Step 10
     rule("Step 10 — export the table")

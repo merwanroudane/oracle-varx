@@ -122,6 +122,8 @@ def plot_lag_tracking(
         ax.set_xlabel("time" if results.index is None else "date")
         ax.set_ylabel("lag order")
         ax.set_yticks(np.arange(0, results.p_max + 1))
+        # Headroom so the legend never sits on top of a run at the maximum lag.
+        ax.set_ylim(-0.25, results.p_max + 0.9)
         ax.set_title(
             title or "Adaptive lag order over time", loc="left"
         )
@@ -221,6 +223,12 @@ def plot_coefficient_paths(
             ax.set_xlabel("time" if results.index is None else "date")
         for row in axes:
             row[0].set_ylabel("coefficient")
+        # The panels are narrow, so a full set of date ticks runs together.
+        for ax in flat[: len(edges)]:
+            ax.xaxis.set_major_locator(plt.MaxNLocator(4))
+            for label in ax.get_xticklabels():
+                label.set_rotation(30)
+                label.set_horizontalalignment("right")
         flat[0].legend(loc="upper right")
         fig.tight_layout()
     return fig, axes
@@ -279,15 +287,20 @@ def plot_edge_heatmap(
         vmin = vmax = None
 
     with plt.rc_context(JOURNAL_RC):
+        # With n series there are n^2 rows, so the natural per-row height runs
+        # away quickly; cap it and shrink the labels instead of emitting a
+        # figure several feet tall.
+        height = min(0.28 * len(labels) + 1.6, 9.5)
+        label_size = 7 if len(labels) <= 36 else max(3.6, 260 / len(labels))
         fig, ax = (ax.figure, ax) if ax is not None else plt.subplots(
-            figsize=(7.2, 0.28 * len(labels) + 1.6)
+            figsize=(7.6, height)
         )
         image = ax.imshow(
             matrix, aspect="auto", origin="lower", cmap=cmap, vmin=vmin, vmax=vmax,
             extent=(0, matrix.shape[1], -0.5, len(labels) - 0.5),
         )
         ax.set_yticks(range(len(labels)))
-        ax.set_yticklabels(labels, fontsize=7)
+        ax.set_yticklabels(labels, fontsize=label_size)
         ax.set_xlabel("output day")
         ax.set_title(
             f"{statistic} statistic at lag {lag}", loc="left"
