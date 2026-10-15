@@ -19,7 +19,7 @@ pip install oracle-varx
 
 | | |
 |---|---|
-| 📦 **PyPI** | <https://pypi.org/project/oracle-varx/> · [v0.1.0](https://pypi.org/project/oracle-varx/0.1.0/) |
+| 📦 **PyPI** | <https://pypi.org/project/oracle-varx/> · [v0.1.1](https://pypi.org/project/oracle-varx/0.1.1/) |
 | 💻 **Source** | <https://github.com/merwanroudane/oracle-varx> |
 | 📖 **Documentation** | <https://merwanroudane.github.io/oracle-varx/> |
 | 📐 **Method notes** | [docs/methods.md](docs/methods.md) |
@@ -656,7 +656,7 @@ Two faithfulness traps worth knowing:
   author  = {Roudane, Merwan},
   title   = {{oracle-varx}: causal lag discovery in confounded time series},
   year    = {2026},
-  version = {0.1.0},
+  version = {0.1.1},
   url     = {https://github.com/merwanroudane/oracle-varx}
 }
 ```

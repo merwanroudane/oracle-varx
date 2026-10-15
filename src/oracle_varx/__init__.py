@@ -41,7 +41,7 @@ try:  # pragma: no cover - the installed-metadata path
 
     __version__ = _version("oracle-varx")
 except Exception:  # pragma: no cover - running from a source checkout
-    __version__ = "0.1.0"
+    __version__ = "0.1.1"
 
 __author__ = "Dr Merwan Roudane"
 __email__ = "merwanroudane920@gmail.com"

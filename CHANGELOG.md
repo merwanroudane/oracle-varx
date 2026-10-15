@@ -4,6 +4,39 @@ All notable changes to `oracle-varx` are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 semantic versioning.
 
+## [0.1.1] - 2026-10-15
+
+A figures-and-ergonomics release. Nothing in the estimator, the inference or the
+numerical results changes: every reproduction check still passes unchanged.
+
+### Fixed
+
+- **Lag-tracking figure:** headroom above `p_max`, so the legend no longer sits
+  on top of a run at the maximum lag.
+- **Coefficient-path figure:** date ticks are thinned and rotated; in a
+  six-panel grid they previously ran into one another and were unreadable.
+- **Edge heatmap:** the figure height is capped and the labels scale with the
+  number of edges. With nine series there are 81 rows, which produced a figure
+  roughly two feet tall and 1.8 MB; it is now a normal page figure of 439 KB.
+- **Causal-graph figure:** a dated graph is titled with a plain date rather than
+  a full timestamp, which used to overrun the title, and the edge and lag counts
+  move to a second line.
+
+### Added
+
+- `OracleVARXResults.plot_lag_vs_volatility`, `.plot_residual_diagnostics` and
+  `.plot_fdr_power_curve` — these existed in `_plots` but had no method on the
+  results object.
+- `examples/treasury_curve.py --cache PATH` saves the fitted model and reuses it,
+  so reworking a figure no longer needs a refit: eight minutes becomes seconds.
+  The script also takes `--learner`, `--block`, `--p-max`, `--n-jobs` and
+  `--quick`, and reports the size of each figure it writes.
+
+### Changed
+
+- The documentation site loads its figures lazily, so the heatmap no longer
+  delays the rest of the page.
+
 ## [0.1.0] - 2026-10-15
 
 Published on PyPI: <https://pypi.org/project/oracle-varx/0.1.0/>
@@ -74,4 +107,5 @@ paper's equations.
   package seeds every learner.
 - No code from the authors' repository is used; it carries no licence.
 
+[0.1.1]: https://github.com/merwanroudane/oracle-varx/releases/tag/v0.1.1
 [0.1.0]: https://github.com/merwanroudane/oracle-varx/releases/tag/v0.1.0

@@ -6,11 +6,11 @@ authors:
   - family-names: Roudane
     given-names: Merwan
     email: merwanroudane920@gmail.com
-version: 0.1.0
+version: 0.1.1
 date-released: "2026-10-15"
 url: "https://pypi.org/project/oracle-varx/"
 repository-code: "https://github.com/merwanroudane/oracle-varx"
-repository-artifact: "https://pypi.org/project/oracle-varx/0.1.0/"
+repository-artifact: "https://pypi.org/project/oracle-varx/0.1.1/"
 license: MIT
 keywords:
   - econometrics
