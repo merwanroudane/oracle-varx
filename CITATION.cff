@@ -8,8 +8,9 @@ authors:
     email: merwanroudane920@gmail.com
 version: 0.1.0
 date-released: "2026-10-15"
-url: "https://github.com/merwanroudane/oracle-varx"
+url: "https://pypi.org/project/oracle-varx/"
 repository-code: "https://github.com/merwanroudane/oracle-varx"
+repository-artifact: "https://pypi.org/project/oracle-varx/0.1.0/"
 license: MIT
 keywords:
   - econometrics

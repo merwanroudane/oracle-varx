@@ -65,6 +65,8 @@ all = [
 Homepage      = "https://merwanroudane.github.io/oracle-varx/"
 Repository    = "https://github.com/merwanroudane/oracle-varx"
 Documentation = "https://merwanroudane.github.io/oracle-varx/"
+"Release notes" = "https://github.com/merwanroudane/oracle-varx/blob/main/CHANGELOG.md"
+PyPI          = "https://pypi.org/project/oracle-varx/"
 Issues        = "https://github.com/merwanroudane/oracle-varx/issues"
 Paper         = "https://doi.org/10.48550/arXiv.2610.05618"
 

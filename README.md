@@ -13,9 +13,20 @@ in Python: it tells you **which series causes which, at what lag, and when**,
 with a coefficient, a standard error, a confidence interval and a
 false-discovery-rate guarantee for every edge.
 
-📖 **Documentation:** https://merwanroudane.github.io/oracle-varx/
-📦 **PyPI:** https://pypi.org/project/oracle-varx/
-🧑‍💻 **Author:** Dr Merwan Roudane · merwanroudane920@gmail.com · [github.com/merwanroudane](https://github.com/merwanroudane)
+```bash
+pip install oracle-varx
+```
+
+| | |
+|---|---|
+| 📦 **PyPI** | <https://pypi.org/project/oracle-varx/> · [v0.1.0](https://pypi.org/project/oracle-varx/0.1.0/) |
+| 💻 **Source** | <https://github.com/merwanroudane/oracle-varx> |
+| 📖 **Documentation** | <https://merwanroudane.github.io/oracle-varx/> |
+| 📐 **Method notes** | [docs/methods.md](docs/methods.md) |
+| 📄 **The paper** | [doi:10.48550/arXiv.2610.05618](https://doi.org/10.48550/arXiv.2610.05618) |
+| 📝 **Changelog** | [CHANGELOG.md](CHANGELOG.md) |
+| 🐛 **Issues** | <https://github.com/merwanroudane/oracle-varx/issues> |
+| 🧑‍💻 **Author** | Dr Merwan Roudane · merwanroudane920@gmail.com · [github.com/merwanroudane](https://github.com/merwanroudane) |
 
 ---
 

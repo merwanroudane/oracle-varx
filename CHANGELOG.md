@@ -6,6 +6,9 @@ semantic versioning.
 
 ## [0.1.0] - 2026-10-15
 
+Published on PyPI: <https://pypi.org/project/oracle-varx/0.1.0/>
+Install with `pip install oracle-varx`.
+
 First release. Implements Tan, Zanoria, Chen, Lyu and Cucuringu (2026),
 *Causal Lag Structure Discovery in Confounded Time Series via Orthogonalized
 Adaptive Estimation*, `doi:10.48550/arXiv.2610.05618`, reimplemented from the
