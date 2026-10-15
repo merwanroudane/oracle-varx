@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>oracle-varx — causal lag discovery in confounded time series</title>
+<meta name="description" content="Python implementation of ORACLE-VARX: double machine learning, adaptive causal lag selection and FDR-controlled edge discovery for multivariate time series.">
+<meta name="author" content="Dr Merwan Roudane">
+<meta property="og:title" content="oracle-varx">
+<meta property="og:description" content="Which series causes which, at what lag, and when — with a confidence interval and an FDR guarantee for every edge.">
+<meta property="og:image" content="https://merwanroudane.github.io/oracle-varx/assets/causal_graph.png">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+
+<header class="bar" id="bar">
+  <div class="wrap">
+    <div class="brand">oracle<span>-varx</span></div>
+    <nav class="links">
+      <a href="#install">Install</a>
+      <a href="#theory">Theory</a>
+      <a href="#api">API</a>
+      <a href="#application">Example</a>
+      <a href="#interpret">Outputs</a>
+      <a href="#beyond">Beyond the paper</a>
+      <a href="#references">References</a>
+      <a class="icon" href="https://github.com/merwanroudane/oracle-varx">GitHub</a>
+      <a class="icon" href="https://pypi.org/project/oracle-varx/">PyPI</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <h1>oracle-varx</h1>
+    <p class="pitch">Which series causes which, at what lag, and when — with a coefficient, a standard error, a confidence interval and a false-discovery-rate guarantee for every edge.</p>
+    <p class="cite">A Python implementation of <strong>ORACLE-VARX</strong>, from Tan, Zanoria, Chen, Lyu and Cucuringu (2026), <em>Causal Lag Structure Discovery in Confounded Time Series via Orthogonalized Adaptive Estimation</em>, <a href="https://doi.org/10.48550/arXiv.2610.05618">doi:10.48550/arXiv.2610.05618</a>. Reimplemented from the paper's equations.</p>
+    <div class="install">
+      <span id="pipline">pip install oracle-varx</span>
+      <button onclick="copyText('pipline', this)">Copy</button>
+    </div>
+    <div class="buttons">
+      <a class="btn" href="https://github.com/merwanroudane/oracle-varx">GitHub</a>
+      <a class="btn ghost" href="https://pypi.org/project/oracle-varx/">PyPI</a>
+      <a class="btn ghost" href="https://doi.org/10.48550/arXiv.2610.05618">Read the paper</a>
+    </div>
+    <div class="pills">
+      <span class="pill">v0.1.0</span>
+      <span class="pill">MIT licence</span>
+      <span class="pill">Python ≥ 3.10</span>
+      <span class="pill">Dr Merwan Roudane</span>
+    </div>
+  </div>
+</div>
+
+<!-- ------------------------------------------------------------- what -->
+<section id="what">
+  <div class="wrap">
+    <div class="eyebrow">What it does</div>
+    <h2>Three stages, one pipeline</h2>
+    <p class="lead">Classical Granger analysis assumes confounders are linear or absent, fixes the lag order once for the whole sample, and tests every edge separately. ORACLE-VARX fixes all three at once.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="ico">🧮</div>
+        <strong>Orthogonalisation</strong>
+        <p>A flexible learner predicts the outcomes and the lagged series from the confounders; the lag coefficients are estimated on the residuals, so nonlinear confounding goes without assuming its shape. <em>§3.2, eq. (4)–(8)</em></p>
+      </div>
+      <div class="card teal">
+        <div class="ico">📐</div>
+        <strong>Adaptive lag order</strong>
+        <p>In each rolling window, lags are added while they stay significant, and the significance level itself is tuned on validation forecasts — so the lag order moves with the regime. <em>§3.3, eq. (9)–(10)</em></p>
+      </div>
+      <div class="card amber">
+        <div class="ico">🎯</div>
+        <strong>FDR-controlled edges</strong>
+        <p>A Benjamini–Hochberg step over all entry-wise tests in the window selects directed, lag-annotated edges at a target false discovery rate. <em>§3.4, Appendix D.4</em></p>
+      </div>
+      <div class="card sky">
+        <div class="ico">📊</div>
+        <strong>Journal output</strong>
+        <p>Aligned tables with stars, booktabs LaTeX, Markdown, and figures in one Parula-based style. A real public-domain dataset ships with the package, so everything runs offline.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ---------------------------------------------------------- install -->
+<section id="install">
+  <div class="wrap">
+    <div class="eyebrow">Installation</div>
+    <h2>One line, then you are working</h2>
+    <div class="codewrap">
+      <button onclick="copyPre(this)">Copy</button>
+<pre><code class="language-bash">pip install oracle-varx                  # core
+pip install "oracle-varx[boost]"         # + LightGBM and XGBoost first stages
+pip install "oracle-varx[plotly]"        # + interactive 3-D surfaces
+pip install "oracle-varx[data]"          # + yfinance, for the sector-ETF example
+pip install "oracle-varx[all]"           # everything</code></pre>
+    </div>
+    <p>Requires Python ≥ 3.10 with <code>numpy</code>, <code>scipy</code>, <code>pandas</code>, <code>scikit-learn</code>, <code>statsmodels</code>, <code>matplotlib</code> and <code>joblib</code>, all installed automatically. The package name has a hyphen; the import name has an underscore.</p>
+    <div class="note"><p><strong>Never used Python?</strong> The README has a <a href="https://github.com/merwanroudane/oracle-varx#2-start-from-absolutely-nothing">from-zero section</a>: installing Anaconda, opening a terminal, running your first line. Fifteen minutes, no prior knowledge assumed.</p></div>
+  </div>
+</section>
+
+<!-- ----------------------------------------------------------- theory -->
+<section id="theory">
+  <div class="wrap">
+    <div class="eyebrow">Theory</div>
+    <h2>The model, the estimator, and what is actually proved</h2>
+    <div class="card theory">
+      <h3>The partially linear VARX</h3>
+      <p>With \(n\) endogenous series and \(d\) confounders, the model of eq. (2) is</p>
+      $$ Y_t = \sum_{k=1}^{p^*} A_k Y_{t-k} + g(W_{t-1},\dots,W_{t-p}) + \varepsilon_t,
+         \qquad \mathbb{E}[\varepsilon_t \mid Y_{t-1},\dots,W_{t-p}] = 0 .$$
+      <p>The lag effects stay linear, so they remain interpretable and testable; the confounder effect \(g\) is left completely unrestricted. The <strong>causal lag graph</strong> of Definition 1 has an edge \((Y^{(j)} \to Y^{(i)}, k)\) exactly when \(A_k[i,j] \neq 0\).</p>
+
+      <h3>Orthogonalisation</h3>
+      <p>Stack the lags into \(T_t\) and the confounders into \(C_t\) (eq. 3). The model becomes partially linear, and three steps follow: cross-fitted nuisance estimation, residualisation (eq. 6), and OLS on the residuals (eq. 7),</p>
+      $$ \hat\Theta = \Big(\textstyle\sum_t \tilde T_t \tilde T_t^{\top}\Big)^{-1}
+                      \Big(\textstyle\sum_t \tilde T_t \tilde Y_t^{\top}\Big),
+         \qquad
+         \tilde Y_t = Y_t - \hat g_Y(C_t), \;\; \tilde T_t = T_t - \hat g_T(C_t) .$$
+      <p>The estimator is Neyman orthogonal, so first-stage error enters only at second order — which is what permits machine learning in the first stage without losing valid inference. Standard errors are the classical OLS form on the residualised data (eq. 8), with <strong>no HAC correction</strong>: under conditional homoskedasticity the martingale central limit theorem leaves no autocovariance terms.</p>
+
+      <h3>Adaptive causal lag estimation</h3>
+      <p>Lag 1 is always kept. For \(p = 2,\dots,p_{\max}\), the null \(H_0: A_p[i,j]=0\) for all \((i,j)\) is tested by applying Benjamini–Hochberg at level \(\alpha\) to the \(n^2\) entry-wise z-tests of the lag-\(p\) block, taken from the \(p_{\max}\) fit; the first insignificant \(p\) stops the search. The level itself is then chosen by rolling validation (eq. 10),</p>
+      $$ \alpha^{*}_t = \arg\min_{\alpha} \mathrm{RMSE}_v(p_\alpha; t), \qquad \hat p_t = p_{\alpha^{*}_t} .$$
+
+      <h3>Theorem 1 — local asymptotic normality</h3>
+      <p>Under Assumption 1, for every entry of \(\Theta\),</p>
+      $$ \frac{\hat\Theta_{ri} - \bar\Theta_{ri}}{\hat s_{ri}} \xrightarrow{\;d\;} N(0,1), $$
+      <p>where \(\bar\Theta\) is the window-averaged target of eq. (11); and if \(T_w = o(T^{2/3})\), the centring may be replaced by \(\Theta(u_0)\), the coefficient at the window's own date. Every confidence interval and p-value this package reports rests on this theorem, and <code>admissible_window</code> checks which of the two readings your window supports.</p>
+
+      <div class="warn"><p><strong>Causal sufficiency does the work.</strong> A zero coefficient equals Granger non-causality only when every common cause of the series is observed in \(W\) (Proposition A.13). With a hidden confounder the coefficients become the best linear lead–lag predictor from the observed series: useful for forecasting, no longer causal, and the FDR guarantee lapses. The package fits regardless; the interpretation is yours.</p></div>
+
+      <h3>What is not proved</h3>
+      <p>ACLE is a heuristic. Theorem 1 explains why it tracks the lag order — above the true order the z-statistics stay of order one, while a true lag has an entry whose \(|z|\) grows like \(\sqrt{T_w}\) — but a formal consistency result covering the BH step and the validation-chosen level is left open by the paper.</p>
+    </div>
+
+    <h3>Step → equation map</h3>
+    <p class="lead">The visible proof that the implementation is faithful. The full map, with the derivations, is in <a href="https://github.com/merwanroudane/oracle-varx/blob/main/docs/methods.md">docs/methods.md</a>.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Code</th><th>Paper</th><th>What it computes</th></tr></thead>
+        <tbody>
+          <tr><td><code>_utils.build_stacks</code></td><td>eq. (3)</td><td><code>T_t = [Y_{t-1}…Y_{t-p}]</code>, <code>C_t = [W_{t-1}…W_{t-p}]</code></td></tr>
+          <tr><td><code>_utils.blocked_folds</code></td><td>§3.2</td><td>blocked rolling folds, <code>s_{k+1} = s_k + n_test</code></td></tr>
+          <tr><td><code>_nuisance.cross_fit</code></td><td>eq. (6)</td><td>out-of-sample residualisation, one fit per block</td></tr>
+          <tr><td><code>_core.second_stage</code></td><td>eq. (7)–(8)</td><td><code>Θ̂</code> and its standard errors, batched over windows</td></tr>
+          <tr><td><code>_core._dml_windows</code></td><td>Alg. 1 line 7</td><td><code>ĝ_Y(C_t) + Θ̂ᵀ(T_t − ĝ_T(C_t))</code></td></tr>
+          <tr><td><code>_core.acle_stage1</code></td><td>§3.3 Stage 1</td><td>sequential BH tests on the <code>p_max</code> fit</td></tr>
+          <tr><td><code>_core.rolling_validation</code></td><td>eq. (9)–(10)</td><td>the validation-chosen level, per day</td></tr>
+          <tr><td><code>_core.bh_edges</code></td><td>§3.4, D.4</td><td>BH over <code>n² p̂</code> tests, with q-values</td></tr>
+          <tr><td><code>_results.conf_int</code></td><td>Theorem 1</td><td><code>coef ± z<sub>1−α/2</sub> · se</code></td></tr>
+          <tr><td><code>evaluation.window_target</code></td><td>eq. (11)</td><td>the window-averaged truth the estimates target</td></tr>
+          <tr><td><code>_utils.admissible_window</code></td><td>assumption (W)</td><td>whether to read <code>Θ(u₀)</code> or only <code>Θ̄</code></td></tr>
+          <tr><td><code>datasets.make_oracle_dgp</code></td><td>§5.1, eq. (12)</td><td>the known-truth benchmark</td></tr>
+          <tr><td><code>cost_report</code></td><td>D.3</td><td><code>S = n p_max (p_max+3)/2</code> fits per block</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- -------------------------------------------------------------- api -->
+<section id="api">
+  <div class="wrap">
+    <div class="eyebrow">API</div>
+    <h2>Syntax reference</h2>
+
+    <div class="card">
+      <h3><code>oracle_varx(Y, W=None, …)</code></h3>
+      <p class="lead">The one-call front door; returns an <code>OracleVARXResults</code>.</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>Y</code></td><td>DataFrame / array</td><td>—</td><td>endogenous series <code>(T, n)</code>; names and dates kept</td></tr>
+            <tr><td><code>W</code></td><td>DataFrame / array / None</td><td><code>None</code></td><td>confounders <code>(T, d)</code> — eq. (2)'s <code>g</code></td></tr>
+            <tr><td><code>p_max</code></td><td>int</td><td><code>5</code></td><td>maximum lag order; assumption (M) needs <code>p_max ≥ p*</code></td></tr>
+            <tr><td><code>method</code></td><td>str</td><td><code>"oracle-varx"</code></td><td>a rung of Table 1</td></tr>
+            <tr><td><code>learner</code></td><td>str / estimator</td><td><code>"extra_trees"</code></td><td>first stage (Table 10 B), or your own estimator</td></tr>
+            <tr><td><code>ols_window</code></td><td>int</td><td><code>200</code></td><td>second-stage rolling window <code>T_w</code> — eq. (7)</td></tr>
+            <tr><td><code>block</code></td><td>int</td><td><code>20</code></td><td>cross-fitting block <code>n_test</code> and refit interval — §3.2</td></tr>
+            <tr><td><code>validation_days</code></td><td>int</td><td><code>20</code></td><td>trailing validation window <code>v</code> — eq. (9)</td></tr>
+            <tr><td><code>q</code></td><td>float</td><td><code>0.05</code></td><td>target false discovery rate — §3.4</td></tr>
+            <tr><td><code>correction</code></td><td>str</td><td><code>"fdr_bh"</code></td><td><code>"fdr_by"</code> is an addition, valid under arbitrary dependence</td></tr>
+            <tr><td><code>seed</code></td><td>int / None</td><td><code>42</code></td><td>threaded through every learner and worker</td></tr>
+            <tr><td><code>n_jobs</code></td><td>int</td><td><code>1</code></td><td>blocks in parallel; never changes a number</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card teal">
+      <h3>The method hierarchy — the paper's Table 1</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th><code>method</code></th><th>Lag selection</th><th>Confounders</th><th>DML</th></tr></thead>
+          <tbody>
+            <tr><td><code>"var"</code></td><td>rolling RMSE</td><td>none</td><td>–</td></tr>
+            <tr><td><code>"varx"</code></td><td>rolling RMSE</td><td>linear</td><td>–</td></tr>
+            <tr><td><code>"acle-var"</code></td><td>ACLE</td><td>none</td><td>–</td></tr>
+            <tr><td><code>"acle-varx"</code></td><td>ACLE</td><td>linear</td><td>–</td></tr>
+            <tr><td><code>"or-varx"</code></td><td>rolling RMSE</td><td>nonlinear</td><td>✓</td></tr>
+            <tr><td><code>"oracle-varx"</code></td><td>ACLE</td><td>nonlinear</td><td>✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Each row adds one capability to the row above, so any result can be attributed to the component that produced it.</p>
+    </div>
+
+    <div class="card sky">
+      <h3><code>OracleVARXResults</code></h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Attribute / method</th><th>Returns</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>.coef</code>, <code>.se</code></td><td><code>(B, p_max, n, n)</code></td><td><code>A_k[i,j]</code>: effect of <code>j</code> at lag <code>k+1</code> on <code>i</code></td></tr>
+            <tr><td><code>.z</code>, <code>.pvalues</code>, <code>.qvalues</code></td><td>same shape</td><td>inference, and BH-adjusted q-values</td></tr>
+            <tr><td><code>.conf_int(level)</code></td><td><code>(lower, upper)</code></td><td>from Theorem 1</td></tr>
+            <tr><td><code>.edges</code></td><td>bool array</td><td>the BH selection</td></tr>
+            <tr><td><code>.lag</code>, <code>.alpha</code></td><td><code>(B,)</code></td><td>selected lag order and Stage-1 level per day</td></tr>
+            <tr><td><code>.graph(window)</code></td><td><code>CausalLagGraph</code></td><td>one period's discovered graph</td></tr>
+            <tr><td><code>.edge_persistence()</code></td><td>DataFrame</td><td>how often each edge survives BH</td></tr>
+            <tr><td><code>.summary()</code> / <code>.to_latex()</code> / <code>.to_markdown()</code></td><td>table</td><td>one source, three renderings</td></tr>
+            <tr><td><code>.plot_lag_tracking()</code></td><td><code>(fig, ax)</code></td><td>the paper's Figure 4</td></tr>
+            <tr><td><code>.plot_coefficient_paths()</code></td><td><code>(fig, axes)</code></td><td>the paper's Figure 3</td></tr>
+            <tr><td><code>.plot_lag_vs_volatility()</code></td><td><code>(fig, axes)</code></td><td>the paper's Figure 5</td></tr>
+            <tr><td><code>.plot_edge_heatmap()</code>, <code>.plot_graph()</code>, <code>.plot_surface()</code></td><td>figure</td><td>additions</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ------------------------------------------------------ application -->
+<section id="application">
+  <div class="wrap">
+    <div class="eyebrow">Worked example</div>
+    <h2>A complete analysis, on real public-domain data</h2>
+    <p class="lead">The package ships daily <strong>US Treasury yield-curve changes</strong>: nine nominal maturities as the system, the real (TIPS) curve as the observed confounders, 2006-02-10 to 2020-12-31, 3,724 trading days, from the U.S. Treasury — a work of the federal government, so public domain. The question is the paper's own, asked of the curve: which maturities lead which, at what lags, once the common real-rate factors are stripped out nonlinearly?</p>
+
+    <h3>Step 1 — load and configure</h3>
+    <div class="codewrap"><button onclick="copyPre(this)">Copy</button>
+<pre><code class="language-python">from oracle_varx import OracleVARX, OracleVARXConfig
+from oracle_varx.datasets import load_treasury
+
+Y, W = load_treasury()
+print(Y.shape, W.shape)        # (3724, 9) (3724, 4)
+
+config = OracleVARXConfig(p_max=5, ols_window=252, block=21,
+                          validation_days=21, lag_offset=5, q=0.05)
+print(config.summary())</code></pre></div>
+
+    <h3>Step 2 — estimate</h3>
+    <div class="codewrap"><button onclick="copyPre(this)">Copy</button>
+<pre><code class="language-python">model = OracleVARX(config, method="oracle-varx", learner="extra_trees",
+                   seed=42, n_jobs=4)
+res = model.fit(Y, W)
+print(res.summary())           # the journal table for the last trading day</code></pre></div>
+
+    <h3>Step 3 — read the graph, and how stable it is</h3>
+    <div class="codewrap"><button onclick="copyPre(this)">Copy</button>
+<pre><code class="language-python">print(res.graph(-1))                 # the last day's causal lag graph
+print(res.edge_persistence())        # share of windows in which each edge survives
+print(res.lag_series().groupby(res.index.year).mean())   # lag order by year</code></pre></div>
+
+    <h3>The output on the benchmark, where the truth is known</h3>
+    <p>The same call on the paper's own synthetic benchmark, where the data-generating process has exactly one causal cycle at lag 1 — <code>Z → X → Y → Z</code>, each with a coefficient of 0.60:</p>
+    <div class="codewrap"><button onclick="copyPre(this)">Copy</button>
+<pre><code class="language-python">from oracle_varx import oracle_varx
+from oracle_varx.datasets import make_oracle_dgp
+
+Y, W, truth = make_oracle_dgp(n_obs=600, seed=42)
+res = oracle_varx(Y, W, p_max=4, learner="linear", ols_window=120,
+                  block=20, validation_days=15, seed=42)
+print(res.summary())</code></pre></div>
+<pre class="output">================================================================================================
+       ORACLE-VARX: causal lag discovery  (Tan, Zanoria, Chen, Lyu and Cucuringu (2026))
+
+  Output day         : 583                     Series             :        3
+  Rolling window T_w : 120                     Confounders        :        3
+  Maximum lag p_max  : 4                       Selected lag p_hat :        1
+  First stage        : linear                  Stage-1 alpha*     :     0.25
+  Edge FDR level q   : 0.050                   Discovered edges   :        4
+------------------------------------------------------------------------------------------------
+ lag      from        to       Coef.    Std.Err.         z     P&gt;|z|      [95% Conf. Int.]
+------------------------------------------------------------------------------------------------
+   1         X         X      0.2333      0.0924     2.524     0.012     0.0522     0.4145 **
+   1         Y         X      0.0281      0.1040     0.271     0.787    -0.1756     0.2319
+   1         Z         X      0.8772      0.1190     7.374     0.000     0.6441     1.1103 ***
+   1         X         Y      0.5646      0.0866     6.516     0.000     0.3948     0.7344 ***
+   1         Y         Y      0.1032      0.0974     1.059     0.290    -0.0878     0.2942
+   1         Z         Y     -0.0428      0.1115    -0.384     0.701    -0.2613     0.1757
+   1         X         Z     -0.1001      0.0747    -1.341     0.180    -0.2464     0.0462
+   1         Y         Z      0.7219      0.0840     8.598     0.000     0.5574     0.8865 ***
+   1         Z         Z      0.0206      0.0961     0.214     0.831    -0.1678     0.2089
+------------------------------------------------------------------------------------------------
+Selected lag order (p_hat)                           1
+Edges at FDR q = 0.05                           4 of 9
+Strongest edge                    Z -&gt; X (lag 1, 0.8772)
+Residual d.o.f.                                    108
+================================================================================================
+Significance: *** p&lt;0.01, ** p&lt;0.05, * p&lt;0.10 (two-sided z-tests, Theorem 1).
+Standard errors: classical (eq. 8), conditional homoskedasticity.
+Edges: Benjamini-Hochberg over the n^2 * p_hat entry-wise tests (Appendix D.4).
+Edges are causal only under causal sufficiency: every common cause observed.</pre>
+    <p>The three starred off-diagonal entries are exactly the true cycle. Averaged over every window of the paper's full benchmark the estimates land on 0.584, 0.608 and 0.605 against a truth of 0.600.</p>
+
+    <h3>Figures, from the shipped example</h3>
+    <figure><img src="assets/lag_tracking.png" alt="The adaptively selected lag order over time"><figcaption><strong>The adaptive lag order over time.</strong> The paper's Figure 4. In calm periods a single lag suffices; the order rises when the structure lengthens.</figcaption></figure>
+    <figure><img src="assets/lag_vs_volatility.png" alt="Selected lag order against realised volatility"><figcaption><strong>Lag order and market stress.</strong> The paper's Figure 5: the selected order plotted against 21-day realised volatility on a twin axis.</figcaption></figure>
+    <figure><img src="assets/coefficient_paths.png" alt="Coefficient paths with confidence bands"><figcaption><strong>Coefficient paths with confidence bands.</strong> The paper's Figure 3, plus the confidence band it does not draw. A band that stops containing zero is the edge switching on.</figcaption></figure>
+    <figure><img src="assets/edge_heatmap.png" alt="Heatmap of edge z-statistics through time"><figcaption><strong>Every edge's z-statistic through time</strong>, on the Parula scale. An addition: the whole sequence of graphs at a glance, rather than one window at a time.</figcaption></figure>
+    <figure><img src="assets/causal_graph.png" alt="The discovered causal lag graph"><figcaption><strong>The discovered causal lag graph.</strong> Edge width scales with the coefficient, colour encodes the lag. An addition.</figcaption></figure>
+    <figure><img src="assets/residual_diagnostics.png" alt="Residual diagnostics"><figcaption><strong>Residual diagnostics.</strong> Assumption (M) makes the innovations a martingale difference sequence; this is how you check that <code>p_max</code> was deep enough. An addition.</figcaption></figure>
+    <p>The full script is <a href="https://github.com/merwanroudane/oracle-varx/blob/main/examples/treasury_curve.py">examples/treasury_curve.py</a>, and every table and figure on this page comes from it.</p>
+  </div>
+</section>
+
+<!-- -------------------------------------------------------- interpret -->
+<section id="interpret">
+  <div class="wrap">
+    <div class="eyebrow">Interpreting the output</div>
+    <h2>What each number is telling you</h2>
+    <div class="grid">
+      <div class="card">
+        <strong>A row of the table</strong>
+        <p><code>from Z</code>, <code>to X</code>, <code>lag 1</code>, coefficient <code>0.8772</code> means: a one-unit change in <code>Z</code> today goes with a 0.877-unit change in <code>X</code> tomorrow, holding the other lags and the confounders' nonlinear effects fixed.</p>
+      </div>
+      <div class="card rose">
+        <strong>Stars are not edges</strong>
+        <p>Stars mark the individual test. The <em>edges</em> are what survives Benjamini–Hochberg across all <code>n² × p̂</code> tests in the window — stricter, and the thing that carries the FDR guarantee. Read <code>.edges</code> and <code>.qvalues</code>, not the stars, when you want the graph.</p>
+      </div>
+      <div class="card teal">
+        <strong>The selected lag order</strong>
+        <p>Often the headline result. In the paper's ETF data it sits at 1 in calm markets and spikes to 3–5 during the 2008 crisis and the COVID shock: the lag structure elongates as shocks propagate.</p>
+      </div>
+      <div class="card amber">
+        <strong>Edge persistence</strong>
+        <p>Usually more informative than any single window. An edge found in 80% of windows is structure; one found in 3% is noise that happened to clear the threshold.</p>
+      </div>
+      <div class="card sky">
+        <strong>The confidence band</strong>
+        <p>From Theorem 1. On a coefficient path, the moment the band stops containing zero is the moment the edge switches on — which is what the paper's three-regime benchmark is built to show.</p>
+      </div>
+      <div class="card">
+        <strong>The header block</strong>
+        <p>Says what was actually used, not what was offered: the window, the maximum lag, the lag order <em>selected</em> for this day, the Stage-1 level validation chose, and the FDR level.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ----------------------------------------------------------- beyond -->
+<section id="beyond">
+  <div class="wrap">
+    <div class="eyebrow">Beyond the paper</div>
+    <h2>Additions to the original method</h2>
+    <p class="lead">Each is flagged in its own docstring as an addition, and none changes a default.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Addition</th><th>Why it is defensible</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Benjamini–Yekutieli</strong> <code>correction="fdr_by"</code></td><td>§4 concedes BH's guarantee needs independence or positive dependence, which the entry-wise tests in one window — all sharing one <code>Ĵ⁻¹</code> — are not shown to satisfy. BY is valid under arbitrary dependence.</td></tr>
+          <tr><td><strong>A confidence interval and q-value per edge</strong></td><td>The paper lists a per-coefficient interval as a contribution but prints none. Theorem 1 delivers it directly.</td></tr>
+          <tr><td><strong><code>coef_source="p_hat"</code></strong></td><td>Reports each day's coefficients from the fit at its own selected lag order — what the paper's coefficient-error column and Figure 3 actually show.</td></tr>
+          <tr><td><strong>Assumption-(W) guard</strong></td><td>Whether <code>T_w</code> sits below <code>T^{2/3}</code> decides whether an estimate is the coefficient on the day or only the window average. This is where a user silently loses Theorem 1.</td></tr>
+          <tr><td><strong>Assumption diagnostics</strong></td><td>The paper states (M), (S), (W), (R) and checks none of them on data.</td></tr>
+          <tr><td><strong>Coefficient-constancy test</strong></td><td>The premise is drifting coefficients, yet nothing tests the drift.</td></tr>
+          <tr><td><strong>Lag-rule comparison</strong></td><td>ACLE against AIC, BIC and Hannan–Quinn, not only against the paper's own RMSE rule.</td></tr>
+          <tr><td><strong>Leave-one-confounder-out</strong></td><td>§7 asks for tests that flag hidden confounding; this is the orthogonalised analogue of an omitted-variable probe.</td></tr>
+          <tr><td><strong>Edge persistence and per-regime scoring</strong></td><td>The natural summary of a sequence of graphs, and of a benchmark with three regimes, neither of which the paper reports.</td></tr>
+          <tr><td><strong>Extra figures</strong></td><td>Edge heatmaps, a graph drawing, a 3-D surface, FDR/power curves, residual diagnostics.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Faithfulness record</h3>
+    <p>This is a reimplementation from the paper's equations; the authors' repository carries no licence, so none of their code is used. The checks:</p>
+    <ul class="tight">
+      <li><strong>The data-generating process matches exactly.</strong> <code>make_oracle_dgp()</code> regenerates the benchmark data distributed with the paper to <code>max|difference| = 9.6e-16</code> across all 3,000 rows.</li>
+      <li><strong>The published deterministic rows reproduce.</strong> VAR, VARX, ACLE-VAR and ACLE-VARX use no random learner, so they are reproducible by anyone; every metric lands within 0.002 of the published value, with the coefficient error for VAR and VARX matching exactly (0.0605 and 0.0627).</li>
+      <li><strong>The fit count matches Appendix D.3</strong> exactly, and the second stage matches <code>statsmodels</code> to <code>2.8e-17</code> on the standard errors.</li>
+    </ul>
+    <div class="note"><p>Three conventions had to be recovered from the published numbers, and all three are documented in <code>evaluation</code>: the paper's FDR is averaged per window while its power and F1 are pooled; its coefficient error is measured against the truth on the output day while its edges are judged against the window average; and its ACLE coefficient error is read off the selected-lag fit. Also: the paper's own tree-learner rows are not bit-reproducible, since its learners carry no random state.</p></div>
+  </div>
+</section>
+
+<!-- ------------------------------------------------------- references -->
+<section id="references">
+  <div class="wrap">
+    <div class="eyebrow">References</div>
+    <h2>Sources, all DOIs verified</h2>
+    <ol class="tight">
+      <li>Tan, H. K., Zanoria, I.-N., Chen, J., Lyu, H. and Cucuringu, M. (2026). Causal Lag Structure Discovery in Confounded Time Series via Orthogonalized Adaptive Estimation. arXiv:2610.05618. <a href="https://doi.org/10.48550/arXiv.2610.05618">doi:10.48550/arXiv.2610.05618</a></li>
+      <li>Chernozhukov, V. <em>et al.</em> (2018). Double/Debiased Machine Learning for Treatment and Structural Parameters. <em>The Econometrics Journal</em> 21(1), C1–C68. <a href="https://doi.org/10.1111/ectj.12097">doi:10.1111/ectj.12097</a></li>
+      <li>Benjamini, Y. and Hochberg, Y. (1995). Controlling the False Discovery Rate. <em>JRSS-B</em> 57(1), 289–300. <a href="https://doi.org/10.1111/j.2517-6161.1995.tb02031.x">doi:10.1111/j.2517-6161.1995.tb02031.x</a></li>
+      <li>Benjamini, Y. and Yekutieli, D. (2001). The Control of the False Discovery Rate under Dependency. <em>Annals of Statistics</em> 29(4), 1165–1188. <a href="https://doi.org/10.1214/aos/1013699998">doi:10.1214/aos/1013699998</a></li>
+      <li>Granger, C. W. J. (1969). Investigating Causal Relations by Econometric Models and Cross-spectral Methods. <em>Econometrica</em> 37(3), 424–438. <a href="https://doi.org/10.2307/1912791">doi:10.2307/1912791</a></li>
+      <li>Lütkepohl, H. (2005). <em>New Introduction to Multiple Time Series Analysis</em>. Springer. <a href="https://doi.org/10.1007/978-3-540-27752-1">doi:10.1007/978-3-540-27752-1</a></li>
+      <li>Runge, J. <em>et al.</em> (2019). Detecting and quantifying causal associations in large nonlinear time series datasets. <em>Science Advances</em> 5(11), eaau4996. <a href="https://doi.org/10.1126/sciadv.aau4996">doi:10.1126/sciadv.aau4996</a></li>
+      <li>Ballinari, D. and Wehrli, A. (2024). Semiparametric inference for impulse response functions using double/debiased machine learning. arXiv:2411.10009. <a href="https://doi.org/10.48550/arXiv.2411.10009">doi:10.48550/arXiv.2411.10009</a></li>
+      <li>Ciganovic, M., D'Amario, F. and Tancioni, M. (2026). Double Machine Learning for Time Series. <em>The Econometrics Journal</em>. <a href="https://doi.org/10.1093/ectj/utag019">doi:10.1093/ectj/utag019</a></li>
+      <li>Uematsu, Y. and Yamagata, T. (2025). Discovering the Network Granger Causality in Large Vector Autoregressive Models. <em>JASA</em> 120(552), 2385–2396. <a href="https://doi.org/10.1080/01621459.2025.2450836">doi:10.1080/01621459.2025.2450836</a></li>
+      <li>Hollmann, N. <em>et al.</em> (2025). Accurate predictions on small data with a tabular foundation model. <em>Nature</em> 637, 319–326. <a href="https://doi.org/10.1038/s41586-024-08328-6">doi:10.1038/s41586-024-08328-6</a></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ----------------------------------------------------------- author -->
+<section id="author">
+  <div class="wrap">
+    <div class="eyebrow">Author</div>
+    <h2>Dr Merwan Roudane</h2>
+    <div class="card">
+      <div class="authorcard">
+        <div>
+          <p><strong>Dr Merwan Roudane</strong><br>
+          📧 <a href="mailto:merwanroudane920@gmail.com">merwanroudane920@gmail.com</a><br>
+          🔗 <a href="https://github.com/merwanroudane">github.com/merwanroudane</a></p>
+          <p>Released under the MIT Licence.</p>
+        </div>
+        <div>
+          <strong>This package</strong>
+          <ul class="tight">
+            <li><a href="https://github.com/merwanroudane/oracle-varx">Repository</a></li>
+            <li><a href="https://pypi.org/project/oracle-varx/">PyPI</a></li>
+            <li><a href="https://merwanroudane.github.io/oracle-varx/">Documentation</a></li>
+            <li><a href="https://github.com/merwanroudane/oracle-varx/blob/main/docs/methods.md">Method notes</a></li>
+            <li><a href="https://doi.org/10.48550/arXiv.2610.05618">The paper</a></li>
+          </ul>
+        </div>
+        <div>
+          <strong>Other packages</strong>
+          <ul class="tight">
+            <li><a href="https://cran.r-project.org/package=QuantileOnQuantile">QuantileOnQuantile</a> (CRAN)</li>
+            <li><a href="https://cran.r-project.org/package=mqqr">mqqr</a> (CRAN)</li>
+            <li><a href="https://cran.r-project.org/package=qqkrls">qqkrls</a> (CRAN)</li>
+            <li><a href="https://cran.r-project.org/package=mqqcause">mqqcause</a> (CRAN)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card teal">
+      <h3>Cite this package</h3>
+      <div class="codewrap"><button onclick="copyPre(this)">Copy</button>
+<pre><code class="language-bibtex">@software{roudane_oracle_varx_2026,
+  author  = {Roudane, Merwan},
+  title   = {{oracle-varx}: causal lag discovery in confounded time series},
+  year    = {2026},
+  version = {0.1.0},
+  url     = {https://github.com/merwanroudane/oracle-varx}
+}</code></pre></div>
+      <p>Please also cite the original paper: Tan, Zanoria, Chen, Lyu and Cucuringu (2026), <a href="https://doi.org/10.48550/arXiv.2610.05618">doi:10.48550/arXiv.2610.05618</a>.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    © 2026 Dr Merwan Roudane · MIT Licence · oracle-varx v0.1.0 · last updated 15 October 2026
+  </div>
+</footer>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script>
+function copyText(id, button) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent.trim()).then(function () {
+    var original = button.textContent;
+    button.textContent = "Copied";
+    setTimeout(function () { button.textContent = original; }, 1400);
+  });
+}
+function copyPre(button) {
+  var code = button.parentElement.querySelector("pre").innerText;
+  navigator.clipboard.writeText(code).then(function () {
+    var original = button.textContent;
+    button.textContent = "Copied";
+    setTimeout(function () { button.textContent = original; }, 1400);
+  });
+}
+window.addEventListener("scroll", function () {
+  document.getElementById("bar").classList.toggle("scrolled", window.scrollY > 8);
+});
+window.addEventListener("load", function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "\\(", right: "\\)", display: false }
+      ],
+      throwOnError: false
+    });
+  }
+  if (window.hljs) { hljs.highlightAll(); }
+});
+</script>
+</body>
+</html>

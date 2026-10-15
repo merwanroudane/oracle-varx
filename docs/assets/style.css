@@ -1,0 +1,241 @@
+/* oracle-varx documentation site — light, colourful, print-clean.
+   Author: Dr Merwan Roudane. */
+
+:root {
+  /* surfaces */
+  --bg: #fbfcfe;
+  --surface: #ffffff;
+  --surface-2: #f4f7fb;
+  --border: #e3e9f2;
+
+  /* text */
+  --ink: #16202e;
+  --ink-soft: #4b5a70;
+
+  /* accents */
+  --indigo: #4f46e5;
+  --teal: #0d9488;
+  --amber: #f59e0b;
+  --rose: #e11d48;
+  --sky: #0284c7;
+
+  --grad: linear-gradient(135deg, #6366f1 0%, #0ea5e9 50%, #14b8a6 100%);
+
+  --radius: 16px;
+  --shadow: 0 1px 2px rgba(16, 32, 56, 0.06), 0 8px 24px rgba(16, 32, 56, 0.08);
+  --font: "Inter", "Segoe UI", system-ui, sans-serif;
+  --serif: "Source Serif 4", Georgia, serif;
+  --mono: "JetBrains Mono", "Cascadia Code", ui-monospace, monospace;
+
+  --maxw: 1080px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16.5px/1.7 var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 16px; }
+
+a { color: var(--sky); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ---------------------------------------------------------------- top bar */
+header.bar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+header.bar.scrolled { border-bottom-color: var(--border); }
+header.bar .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 58px;
+}
+.brand { font-weight: 700; letter-spacing: -0.01em; font-size: 1.05rem; }
+.brand span { color: var(--indigo); }
+nav.links { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; }
+nav.links a { color: var(--ink-soft); font-size: 0.92rem; font-weight: 500; }
+nav.links a:hover { color: var(--indigo); text-decoration: none; }
+nav.links a.icon { color: var(--ink); font-weight: 600; }
+
+/* ------------------------------------------------------------------- hero */
+.hero { background: var(--grad); color: #fff; padding: 64px 0 56px; }
+.hero h1 { margin: 0 0 10px; font-size: clamp(2rem, 5vw, 3rem); letter-spacing: -0.02em; }
+.hero p.pitch { margin: 0 0 6px; font-size: clamp(1.02rem, 2.2vw, 1.2rem); max-width: 68ch; opacity: 0.97; }
+.hero p.cite { margin: 10px 0 22px; font-size: 0.88rem; opacity: 0.85; max-width: 72ch; }
+.hero a { color: #fff; text-decoration: underline; }
+
+.install {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  margin-bottom: 22px;
+}
+.install button {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+  border: 0;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font: 600 0.78rem var(--font);
+  cursor: pointer;
+}
+.buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn {
+  display: inline-block;
+  padding: 11px 20px;
+  border-radius: 11px;
+  font-weight: 600;
+  font-size: 0.94rem;
+  background: #fff;
+  color: var(--indigo) !important;
+  text-decoration: none !important;
+  box-shadow: 0 2px 10px rgba(16, 32, 56, 0.14);
+}
+.btn.ghost { background: rgba(255, 255, 255, 0.14); color: #fff !important; border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: none; }
+.pills { margin-top: 20px; display: flex; gap: 8px; flex-wrap: wrap; }
+.pill {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  padding: 3px 11px;
+  font-size: 0.78rem;
+}
+
+/* --------------------------------------------------------------- sections */
+section { padding: 58px 0 10px; }
+.eyebrow {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--indigo);
+  margin-bottom: 8px;
+}
+section h2 { margin: 0 0 10px; font-size: clamp(1.4rem, 3vw, 1.9rem); letter-spacing: -0.015em; }
+section h3 { margin: 28px 0 8px; font-size: 1.12rem; }
+section p, section li { max-width: 74ch; color: var(--ink); }
+section p.lead { color: var(--ink-soft); }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 26px 28px;
+  margin: 18px 0;
+  border-top: 4px solid var(--indigo);
+}
+.card.teal { border-top-color: var(--teal); }
+.card.amber { border-top-color: var(--amber); }
+.card.rose { border-top-color: var(--rose); }
+.card.sky { border-top-color: var(--sky); }
+.card h3:first-child { margin-top: 0; }
+
+.grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(234px, 1fr)); }
+.grid .card { margin: 0; }
+.grid .card p { font-size: 0.94rem; color: var(--ink-soft); margin: 6px 0 0; }
+.grid .card strong { font-size: 1rem; }
+.ico { font-size: 1.5rem; line-height: 1; }
+
+.theory { font-family: var(--serif); font-size: 1.04rem; }
+.theory code { font-family: var(--mono); font-size: 0.86em; }
+
+/* ------------------------------------------------------------------- code */
+pre {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  position: relative;
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+pre, code { font-family: var(--mono); }
+code:not(pre code) {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1px 5px;
+  font-size: 0.88em;
+}
+.codewrap { position: relative; }
+.codewrap > button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 4px 9px;
+  font: 600 0.74rem var(--font);
+  color: var(--ink-soft);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.codewrap:hover > button { opacity: 1; }
+pre.output { background: #fff; font-size: 12.6px; line-height: 1.45; }
+
+/* ----------------------------------------------------------------- tables */
+.tablewrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); margin: 16px 0; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; background: var(--surface); }
+th, td { padding: 9px 13px; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: var(--surface-2); font-weight: 600; font-size: 0.82rem; letter-spacing: 0.02em; position: sticky; top: 0; }
+tbody tr:nth-child(even) { background: rgba(244, 247, 251, 0.5); }
+td.num, th.num { text-align: right; font-family: var(--mono); font-size: 0.86rem; }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* --------------------------------------------------------------- callouts */
+.note { border-left: 4px solid var(--amber); background: rgba(245, 158, 11, 0.08); padding: 13px 18px; border-radius: 0 10px 10px 0; margin: 18px 0; }
+.warn { border-left: 4px solid var(--rose); background: rgba(225, 29, 72, 0.07); padding: 13px 18px; border-radius: 0 10px 10px 0; margin: 18px 0; }
+.note p, .warn p { margin: 0; font-size: 0.94rem; }
+
+/* ---------------------------------------------------------------- figures */
+figure { margin: 20px 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); }
+figure img { width: 100%; height: auto; border-radius: 9px; display: block; }
+figcaption { color: var(--ink-soft); font-size: 0.86rem; margin-top: 10px; }
+
+/* ----------------------------------------------------------------- footer */
+footer { margin-top: 56px; padding: 30px 0 40px; border-top: 1px solid var(--border); color: var(--ink-soft); font-size: 0.88rem; }
+.authorcard { display: grid; gap: 22px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+
+ul.tight { padding-left: 20px; }
+ul.tight li { margin: 5px 0; }
+
+@media (max-width: 720px) {
+  nav.links { gap: 12px; }
+  nav.links a:not(.icon) { display: none; }
+  .hero { padding: 44px 0 40px; }
+  section { padding: 42px 0 8px; }
+  .card { padding: 20px 18px; }
+}
+
+@media print {
+  header.bar, .buttons, .install, .codewrap > button { display: none !important; }
+  body { background: #fff; }
+  .hero { background: #fff; color: var(--ink); }
+  .hero a, .hero h1 { color: var(--ink); }
+  .card, figure, pre { box-shadow: none; break-inside: avoid; }
+}

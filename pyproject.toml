@@ -1,0 +1,100 @@
+[build-system]
+requires      = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name            = "oracle-varx"
+version         = "0.1.0"
+description     = "Causal lag discovery in confounded time series: DML, adaptive lag selection, FDR-controlled edges"
+readme          = "README.md"
+requires-python = ">=3.10"
+license         = { text = "MIT" }
+authors         = [{ name = "Merwan Roudane", email = "merwanroudane920@gmail.com" }]
+maintainers     = [{ name = "Merwan Roudane", email = "merwanroudane920@gmail.com" }]
+keywords = [
+  "econometrics",
+  "causal discovery",
+  "granger causality",
+  "vector autoregression",
+  "double machine learning",
+  "false discovery rate",
+  "time series",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Mathematics",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = [
+  "numpy>=1.23",
+  "scipy>=1.9",
+  "pandas>=1.5",
+  "scikit-learn>=1.2",
+  "statsmodels>=0.14",
+  "matplotlib>=3.6",
+  "joblib>=1.2",
+]
+
+[project.optional-dependencies]
+plotly    = ["plotly>=5.15"]
+boost     = ["lightgbm>=4.0", "xgboost>=2.0"]
+tabpfn    = ["tabpfn>=2.0"]
+baselines = ["tigramite>=5.2", "lingam>=1.8"]
+data      = ["yfinance>=0.2"]
+robust    = ["arch>=6.0"]
+dev = [
+  "pytest>=7",
+  "pytest-cov",
+  "build",
+  "twine",
+  "ruff",
+  "tabulate",
+]
+all = [
+  "oracle-varx[plotly,boost,baselines,data,robust]",
+]
+
+[project.urls]
+Homepage      = "https://merwanroudane.github.io/oracle-varx/"
+Repository    = "https://github.com/merwanroudane/oracle-varx"
+Documentation = "https://merwanroudane.github.io/oracle-varx/"
+Issues        = "https://github.com/merwanroudane/oracle-varx/issues"
+Paper         = "https://doi.org/10.48550/arXiv.2610.05618"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/oracle_varx"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/",
+  "tests/",
+  "examples/",
+  "docs/",
+  "README.md",
+  "LICENSE",
+  "CHANGELOG.md",
+  "CITATION.cff",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts   = "-q --doctest-modules --ignore=src/oracle_varx/datasets/_sources.py"
+markers   = [
+  "slow: takes more than a second",
+  "network: needs an internet connection",
+]
+
+[tool.ruff]
+line-length    = 90
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "NPY"]
+ignore = ["E501"]

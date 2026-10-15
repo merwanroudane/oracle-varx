@@ -1,0 +1,83 @@
+cff-version: 1.2.0
+title: "oracle-varx: causal lag discovery in confounded time series"
+message: "If you use this software, please cite both the package and the original paper."
+type: software
+authors:
+  - family-names: Roudane
+    given-names: Merwan
+    email: merwanroudane920@gmail.com
+version: 0.1.0
+date-released: "2026-10-15"
+url: "https://github.com/merwanroudane/oracle-varx"
+repository-code: "https://github.com/merwanroudane/oracle-varx"
+license: MIT
+keywords:
+  - econometrics
+  - causal discovery
+  - Granger causality
+  - vector autoregression
+  - double machine learning
+  - false discovery rate
+abstract: >-
+  A Python implementation of ORACLE-VARX: double/debiased machine learning
+  removes nonlinear confounder effects from the outcomes and the lagged series,
+  adaptive causal lag estimation selects the lag order in each rolling window by
+  sequential significance testing tuned on validation forecasts, and a
+  Benjamini-Hochberg step selects directed, lag-annotated edges at a target false
+  discovery rate, with a coefficient, a standard error and a confidence interval
+  for every edge.
+references:
+  - type: article
+    title: >-
+      Causal Lag Structure Discovery in Confounded Time Series via
+      Orthogonalized Adaptive Estimation
+    authors:
+      - family-names: Tan
+        given-names: Hong Kiat
+      - family-names: Zanoria
+        given-names: Isaac-Neil
+      - family-names: Chen
+        given-names: James
+      - family-names: Lyu
+        given-names: Haoyang
+      - family-names: Cucuringu
+        given-names: Mihai
+    year: 2026
+    doi: "10.48550/arXiv.2610.05618"
+    url: "https://arxiv.org/abs/2610.05618"
+  - type: article
+    title: "Double/Debiased Machine Learning for Treatment and Structural Parameters"
+    authors:
+      - family-names: Chernozhukov
+        given-names: Victor
+      - family-names: Chetverikov
+        given-names: Denis
+      - family-names: Demirer
+        given-names: Mert
+      - family-names: Duflo
+        given-names: Esther
+      - family-names: Hansen
+        given-names: Christian
+      - family-names: Newey
+        given-names: Whitney
+      - family-names: Robins
+        given-names: James
+    journal: "The Econometrics Journal"
+    volume: 21
+    issue: 1
+    year: 2018
+    doi: "10.1111/ectj.12097"
+  - type: article
+    title: >-
+      Controlling the False Discovery Rate: A Practical and Powerful Approach to
+      Multiple Testing
+    authors:
+      - family-names: Benjamini
+        given-names: Yoav
+      - family-names: Hochberg
+        given-names: Yosef
+    journal: "Journal of the Royal Statistical Society: Series B"
+    volume: 57
+    issue: 1
+    year: 1995
+    doi: "10.1111/j.2517-6161.1995.tb02031.x"
